@@ -605,7 +605,7 @@ class _PiecewiseLinearEncodingImpl(nn.Module):
 
         single_bin_mask = torch.tensor(n_bins) == 1
         self.register_buffer(
-            'single_bin_mask', single_bin_mask if single_bin_mask.any() else None
+            'single_bin_mask', single_bin_mask if single_bin_mask.any() else torch.empty(0, dtype=torch.bool)
         )
 
         self.register_buffer(
@@ -663,7 +663,7 @@ class _PiecewiseLinearEncodingImpl(nn.Module):
                     x[..., 1:-1].clamp(0.0, 1.0),
                     (
                         x[..., -1:].clamp_min(0.0)
-                        if self.single_bin_mask is None
+                        if self.single_bin_mask.numel() == 0
                         else torch.where(
                             # For features with only one bin,
                             # the whole "piecewise-linear" encoding effectively behaves
